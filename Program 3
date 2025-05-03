@@ -1,0 +1,93 @@
+import sqlite3
+
+# Connect to SQLite database (this will create the database file if it doesn't exist)
+conn = sqlite3.connect('phonebook.db')
+cursor = conn.cursor()
+
+# Create the Entries table if it doesn't exist
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS Entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    phone_number TEXT NOT NULL
+)
+''')
+conn.commit()
+
+def add_entry(name, phone_number):
+    """Add a new entry to the phone book."""
+    cursor.execute('INSERT INTO Entries (name, phone_number) VALUES (?, ?)', (name, phone_number))
+    conn.commit()
+
+def lookup_entry(name):
+    """Look up a person's phone number."""
+    cursor.execute('SELECT phone_number FROM Entries WHERE name = ?', (name,))
+    result = cursor.fetchone()
+    if result:
+        print(f"{name}'s phone number is {result[0]}")
+    else:
+        print(f"No entry found for {name}")
+
+def update_entry(name, new_phone_number):
+    """Update a person's phone number."""
+    cursor.execute('UPDATE Entries SET phone_number = ? WHERE name = ?', (new_phone_number, name))
+    conn.commit()
+    if cursor.rowcount > 0:
+        print(f"{name}'s phone number has been updated.")
+    else:
+        print(f"No entry found for {name}")
+
+def delete_entry(name):
+    """Delete an entry from the phone book."""
+    cursor.execute('DELETE FROM Entries WHERE name = ?', (name,))
+    conn.commit()
+    if cursor.rowcount > 0:
+        print(f"{name}'s entry has been deleted.")
+    else:
+        print(f"No entry found for {name}")
+
+def display_menu():
+    """Display the menu options to the user."""
+    print("\nPhonebook Menu:")
+    print("1. Add a new entry")
+    print("2. Look up a phone number")
+    print("3. Update a phone number")
+    print("4. Delete an entry")
+    print("5. Exit")
+
+def main():
+    while True:
+        display_menu()
+        choice = input("Choose an option (1-5): ")
+
+        if choice == '1':
+            name = input("Enter the name: ")
+            phone_number = input("Enter the phone number: ")
+            add_entry(name, phone_number)
+
+        elif choice == '2':
+            name = input("Enter the name to look up: ")
+            lookup_entry(name)
+
+        elif choice == '3':
+            name = input("Enter the name to update: ")
+            new_phone_number = input("Enter the new phone number: ")
+            update_entry(name, new_phone_number)
+
+        elif choice == '4':
+            name = input("Enter the name to delete: ")
+            delete_entry(name)
+
+        elif choice == '5':
+            print("Exiting phonebook.")
+            break
+
+        else:
+            print("Invalid choice, please choose a valid option.")
+
+# Run the program
+if __name__ == '__main__':
+    main()
+
+# Close the connection when done
+conn.close()

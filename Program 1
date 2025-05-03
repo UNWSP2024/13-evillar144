@@ -1,0 +1,18 @@
+import sqlite3
+
+# Connect to the cities.db database (created by create_cities_db.py)
+conn = sqlite3.connect('cities.db')
+cursor = conn.cursor()
+
+# Query all cities
+cursor.execute("SELECT * FROM Cities")
+
+# Fetch and print the data
+rows = cursor.fetchall()
+print("CityID | CityName           | Population")
+print("----------------------------------------")
+for row in rows:
+    print(f"{row[0]:<6} | {row[1]:<20} | {row[2]}")
+
+# Clean up
+conn.close()
